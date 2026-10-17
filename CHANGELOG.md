@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 — 2026-10-17
+
+- Match the preview extension family with a navy, mint-outline neural-network icon and blue-grey connections.
+
 ## 0.1.1 — 2026-10-17
 
 - Fix the extension icon export so the artwork fills the square instead of appearing in its upper-left corner.
