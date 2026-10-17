@@ -1,0 +1,46 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: npm run package
+      - if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:package
+      - if: runner.os != 'Linux'
+        run: npm run test:extension
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: onnx-markdown-preview-${{ runner.os }}-vsix
+          path: '*.vsix'
+  # Re-fetches the vendored Netron modules at the pinned commit and fails if a byte differs from
+  # what is committed, so the pin and the files cannot drift apart.
+  vendor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - run: npm run vendor
+      - run: git diff --exit-code -- vendor/netron

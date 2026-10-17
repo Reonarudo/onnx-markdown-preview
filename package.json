@@ -1,0 +1,92 @@
+{
+  "name": "onnx-graph-preview",
+  "version": "0.1.0",
+  "displayName": "ONNX Graph Preview",
+  "description": "Draws ONNX models written as text as Netron-style graphs in VS Code's built-in Markdown preview",
+  "keywords": [
+    "onnx",
+    "netron",
+    "neural network",
+    "model",
+    "graph",
+    "markdown",
+    "markdown-preview"
+  ],
+  "icon": "media/icon.png",
+  "publisher": "ReoX86",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reonarudo/onnx-markdown-preview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Reonarudo/onnx-markdown-preview/issues"
+  },
+  "homepage": "https://github.com/Reonarudo/onnx-markdown-preview#readme",
+  "engines": {
+    "vscode": "^1.95.0",
+    "node": ">=22"
+  },
+  "categories": [
+    "Visualization"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": {
+      "supported": true
+    }
+  },
+  "contributes": {
+    "markdown.markdownItPlugins": true,
+    "markdown.previewStyles": [
+      "media/preview.css"
+    ],
+    "configuration": {
+      "title": "ONNX Graph Preview",
+      "properties": {
+        "onnx.layoutTimeout": {
+          "type": "number",
+          "default": 3,
+          "minimum": 0.5,
+          "maximum": 60,
+          "markdownDescription": "Seconds allowed to lay out one graph before it is abandoned and reported as a timeout. Takes effect on the next render."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "pretest": "npm run build",
+    "test": "node --import tsx --test test/*.test.ts",
+    "build": "node scripts/build.mjs",
+    "vendor": "node scripts/vendor.mjs",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package --no-dependencies",
+    "test:extension": "node scripts/test-extension.mjs",
+    "test:package": "node scripts/test-package.mjs"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "0.9.12",
+    "elkjs": "0.12.0"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "14.2.0",
+    "@types/node": "22.20.3",
+    "@types/vscode": "1.95.0",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "4.0.0",
+    "esbuild": "0.28.2",
+    "markdown-it": "15.0.2",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "@vscode/vsce-sign@2.1.0": true,
+    "fsevents@2.3.3": false
+  }
+}
