@@ -119,3 +119,9 @@ npm run test:extension   # the test suite inside a real VS Code (downloads one)
 The ONNX reader is Netron's own, vendored under `vendor/netron/` at a pinned
 commit; `npm run vendor` re-fetches it, and `THIRD_PARTY_NOTICES.md` says what
 is bundled and under which terms.
+
+To regenerate the Marketplace PNG from its SVG source, use librsvg:
+
+```sh
+rsvg-convert -w 128 -h 128 media/icon.svg -o media/icon.png
+```

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 — 2026-10-17
+
+- Fix the extension icon export so the artwork fills the square instead of appearing in its upper-left corner.
+
 ## 0.1.0 — 2026-10-16
 
 - First release. `onnx` fences holding a model in the ONNX text syntax, the

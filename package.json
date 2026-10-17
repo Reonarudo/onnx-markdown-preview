@@ -1,6 +1,6 @@
 {
   "name": "onnx-graph-preview",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "ONNX Graph Preview",
   "description": "Draws ONNX models written as text as Netron-style graphs in VS Code's built-in Markdown preview",
   "keywords": [
