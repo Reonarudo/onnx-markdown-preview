@@ -4,7 +4,7 @@ import { parseAttributes } from '../src/attributes';
 
 test('reads quoted key="value" pairs, in either quote style, with escapes', () => {
   const { attributes, diagnostics } = parseAttributes(`onnx {alt="A \\"net\\"" caption='Figure 1' align="center" class="wide" direction="RIGHT"}`);
-  assert.deepEqual(attributes, { alt: 'A "net"', caption: 'Figure 1', align: 'center', class: 'wide', direction: 'right' });
+  assert.deepEqual(attributes, { alt: 'A "net"', caption: 'Figure 1', align: 'center', class: 'wide', direction: 'RIGHT' });
   assert.deepEqual(diagnostics, []);
 });
 
@@ -13,14 +13,14 @@ test('a bare tag has no attributes and nothing to report', () => {
   assert.deepEqual(parseAttributes('onnx   '), { attributes: {}, diagnostics: [] });
 });
 
-test('unknown keys, duplicates and bad enum values are dropped one by one, with a note each', () => {
+test('unknown keys, duplicates and bad alignments are dropped one by one, with a note each', () => {
   const { attributes, diagnostics } = parseAttributes('onnx {algin="x" alt="a" alt="b" align="middle" direction="up"}');
-  assert.deepEqual(attributes, { alt: 'a' });
+  // The direction is the renderer's to judge (ADR 0008), so even "up" is passed through.
+  assert.deepEqual(attributes, { alt: 'a', direction: 'up' });
   assert.deepEqual(diagnostics, [
     'Unknown attribute "algin"; ignored.',
     'Duplicate attribute "alt"; keeping the first value.',
-    'Unknown alignment "middle"; ignored.',
-    'Unknown direction "up"; laying out down.'
+    'Unknown alignment "middle"; ignored.'
   ]);
 });
 

@@ -1,57 +1,33 @@
-# Third-party notices and provenance
+# Third-party notices
 
 The extension's original TypeScript, tests, build scripts, and artwork are MIT
-licensed (see `LICENSE`). This does not relicense bundled software.
+licensed (see `LICENSE`). This does not relicense the software it ships.
 
-## Netron 9.3.1 (`vendor/netron/`)
+## ONNX renderer
 
-The ONNX reader is [Netron](https://github.com/lutzroeder/netron)'s own, by Lutz
-Roeder, MIT licensed (`vendor/netron/LICENSE`, also `licenses/NETRON-LICENSE`).
-Five of its source modules are vendored unmodified from commit
-`aa75482bcf0bcf75565c51126eba40de447c476f` (version 9.3.1) and bundled into
-`dist/worker.js`:
+Models are read, laid out and drawn by
+[onnx-renderer](https://github.com/Reonarudo/onnx-renderer) (MIT), shipped in
+this extension under `node_modules/@reonarudo/onnx-renderer/`. It carries the
+ONNX reader from [Netron](https://github.com/lutzroeder/netron) 9.3.1 by Lutz
+Roeder (MIT), vendored unmodified with trimmed operator metadata, and a drawing
+in the style of Netron's. Its own `THIRD_PARTY_NOTICES.md` and `licenses/`
+directory give their provenance and licenses; keep them with any redistribution.
 
-| File | Role |
-| --- | --- |
-| `onnx.js` | The ONNX model reader: text syntax, protobuf text and binary, JSON |
-| `onnx-proto.js` | The `onnx.ModelProto` message classes |
-| `protobuf.js` | Protocol Buffers text and binary decoding |
-| `text.js` | Text decoding |
-| `json.js` | JSON reading |
+## elkjs (Eclipse Layout Kernel)
 
-`onnx-metadata.json` is derived from Netron's `source/onnx-metadata.json` at
-the same commit by `scripts/vendor.mjs`, which keeps each operator's name,
-module, version, category, input and output names and attribute defaults and
-drops the documentation strings, since the preview never shows them.
-`vendor/netron/provenance.json` records the commit and the SHA-256 of every
-upstream file; `vendor/netron/SHA256SUMS` pins the vendored files, and the
-test suite checks both. Netron's `base.js` is not vendored; the one thing the
-reader needs from it, `BigInt.prototype.toNumber`, is re-created in
-`src/context.ts` the same way.
+[`elkjs`](https://www.npmjs.com/package/elkjs), the JavaScript build of the Eclipse
+Layout Kernel by Kiel University and the ELK contributors, places every node and
+routes every edge. It is shipped unmodified under `node_modules/elkjs/` and used
+under the **Eclipse Public License 2.0** (it is dual-licensed EPL-2.0 OR
+GPL-3.0-or-later); the license is in `node_modules/elkjs/LICENSE.md`. Only
+`lib/elk.bundled.js`, which the renderer loads, and `lib/elk-api.js` are shipped;
+the package's other builds are left out. Source: <https://github.com/kieler/elkjs>
+and <https://github.com/eclipse/elk>.
 
-Netron's drawing code is not used. The boxes, rows, pills and category
-colours in `media/preview.css` follow the look of Netron's `grapher.css`,
-reimplemented in `src/draw.ts`.
+## xmldom
 
-## elkjs 0.12.0 (Eclipse Layout Kernel)
+[`@xmldom/xmldom`](https://github.com/xmldom/xmldom), which the renderer uses to
+build and serialise each graph, is shipped under `node_modules/@xmldom/xmldom/`
+with its MIT license.
 
-`dist/worker.js` bundles `lib/elk.bundled.js` from the npm package
-[`elkjs`](https://www.npmjs.com/package/elkjs) 0.12.0: the layered layout algorithm
-of the Eclipse Layout Kernel, transpiled from Java to JavaScript by the elkjs
-project. It places every node and routes every edge.
-
-elkjs is dual-licensed EPL-2.0 OR GPL-3.0-or-later; this extension uses it under the
-**Eclipse Public License 2.0**, whose full text is in `licenses/ELKJS-EPL-2.0.md`.
-Copyright is held by Kiel University and the ELK contributors. It is bundled
-unmodified; esbuild only removes whitespace from the file. Source code:
-<https://github.com/kieler/elkjs> (the JavaScript build) and
-<https://github.com/eclipse/elk> (the Java source it is transpiled from).
-
-npm integrity
-`sha512-YZcKynxVxYoKIOEpywEPwCFdg+BTbxQRNf3pbwdDCvc8O3kQD8bmIwSxKU1eOTVc4Xo+VG9Te+575mlfvOrhEQ==`.
-
-## XML library
-
-`@xmldom/xmldom` 0.9.12 is bundled to build and serialise each graph. Its MIT
-license and attribution are in `licenses/XMLDOM-LICENSE`. npm integrity
-`sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==`.
+The exact versions are locked in `package-lock.json`.

@@ -1,22 +1,19 @@
 import { build } from 'esbuild';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 
+// A clean `dist/`, so a VSIX never carries a file an older build left behind.
+await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
 await build({
-  entryPoints: ['src/extension.ts', 'src/worker.ts'],
+  entryPoints: ['src/extension.ts'],
   outdir: 'dist',
   bundle: true,
   platform: 'node',
-  target: 'node20',
+  target: 'node22',
   format: 'cjs',
-  // `vscode` is provided by the host. ELK, xmldom, the Netron modules and the trimmed operator
-  // metadata are bundled into `worker.js`, so the packaged extension ships no node_modules
-  // (see THIRD_PARTY_NOTICES.md).
-  external: ['vscode'],
-  // The metadata is handed to Netron as the JSON text it parses itself.
-  loader: { '.json': 'text' },
-  // esbuild reprints the already-minified ELK in expanded form, doubling it to 3.6 MB. Removing
-  // whitespace alone brings it back to 1.8 MB and keeps identifiers readable in stack traces.
-  minifyWhitespace: true,
+  // `vscode` is provided by the host. The renderer library is not bundled: it ships installed in
+  // the VSIX's `node_modules`, where its worker and Netron modules sit where it expects them
+  // (ADR 0010).
+  external: ['vscode', '@reonarudo/onnx-renderer'],
   sourcemap: false
 });

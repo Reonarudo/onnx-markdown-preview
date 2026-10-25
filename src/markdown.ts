@@ -1,6 +1,6 @@
 import type MarkdownItConstructor from 'markdown-it';
 type MarkdownIt = InstanceType<typeof MarkdownItConstructor>;
-import type { RenderResult } from './renderer';
+import type { RenderInput, RenderResult } from '@reonarudo/onnx-renderer';
 import { parseAttributes, type FenceAttributes } from './attributes';
 
 /** The class on every graph's root `<svg>`, so the preview stylesheet can select it. */
@@ -14,11 +14,8 @@ export const BASE_CLASS = 'onnx';
  */
 const CLAIMED = /^onnx(?:\s+\{|$)/;
 
-/**
- * `env` is markdown-it's render environment; VS Code puts the document's URI in it. `attributes`
- * are the fence's, already checked: the renderer reads `direction` from them.
- */
-export type Render = (source: string, env: unknown, attributes: FenceAttributes) => RenderResult;
+/** One fence through the library: its body, and its `direction` attribute as written. */
+export type Render = (input: RenderInput) => RenderResult;
 export type Report = (message: string) => void;
 
 /**
@@ -41,9 +38,20 @@ export function markdownPlugin(md: MarkdownIt, render: Render, report: Report = 
     for (const diagnostic of diagnostics) {
       report(diagnostic);
     }
-    const result = render(token.content, env, attributes);
+    const input: RenderInput = { source: token.content };
+    if (attributes.direction !== undefined) input.direction = attributes.direction;
+    let result: RenderResult;
+    try {
+      result = render(input);
+    } catch (error) {
+      // The renderer throws only for programmer errors, but a throw here would remove the whole
+      // extension from the preview, so it degrades this fence alone.
+      const cause = error instanceof Error ? error.message : String(error);
+      report(`ONNX render failed: ${cause}`);
+      return errorReport(md, `The graph renderer failed: ${cause}`);
+    }
     if (result.status !== 'success') return errorReport(md, describe(result, token.content));
-    return wrap(md, withClass(md, result.output, attributes.class), attributes);
+    return wrap(md, sized(withClass(md, result.output, attributes.class)), attributes);
   };
   return md;
 }
@@ -52,6 +60,16 @@ export function markdownPlugin(md: MarkdownIt, render: Render, report: Report = 
 function withClass(md: MarkdownIt, svg: string, extra: string | undefined): string {
   if (!extra) return svg;
   return svg.replace(/^<svg class="onnx"/, `<svg class="${md.utils.escapeHtml(`${BASE_CLASS} ${extra}`)}"`);
+}
+
+/**
+ * Give the graph its natural width. The renderer emits a `viewBox` and no size, so a small graph
+ * would otherwise stretch to the preview column; its units are pixels, the same width the
+ * extension drew before. The stylesheet still scales a wide one down.
+ */
+function sized(svg: string): string {
+  const width = /^<svg\b[^>]*\sviewBox="[^"\s]+\s+[^"\s]+\s+([0-9.]+)\s/.exec(svg)?.[1];
+  return width ? svg.replace(/^<svg class="[^"]*"/, (start) => `${start} width="${width}px"`) : svg;
 }
 
 function wrap(md: MarkdownIt, graph: string, attributes: FenceAttributes): string {
@@ -89,8 +107,9 @@ function describe(result: Exclude<RenderResult, { status: 'success' }>, source: 
   const text = result.line !== undefined ? lines[result.line - 1]?.replace(/\r$/, '') : undefined;
   if (text === undefined || result.line === undefined) return result.message;
   const gutter = `${result.line} │ `;
-  // One past the end is allowed: that is where the reader points when a token is missing.
-  const column = Math.min(Math.max(result.column ?? 0, 0), text.length + 1);
+  // Columns are 1-based. One past the end is allowed: that is where the reader points when a token
+  // is missing.
+  const column = Math.min(Math.max((result.column ?? 1) - 1, 0), text.length + 1);
   return `${result.message}\n\n${gutter}${text}\n${' '.repeat(gutter.length + column)}^`;
 }
 

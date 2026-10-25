@@ -1,5 +1,3 @@
-import type { Direction } from './layout';
-
 export type Alignment = 'left' | 'center' | 'right';
 
 export interface FenceAttributes {
@@ -7,8 +5,11 @@ export interface FenceAttributes {
   caption?: string;
   class?: string;
   align?: Alignment;
-  /** Which way the graph flows; absent means down. */
-  direction?: Direction;
+  /**
+   * Which way the graph flows, exactly as written; absent means down. The renderer rejects
+   * anything but `down` or `right` (ADR 0008), so it is not checked here.
+   */
+  direction?: string;
 }
 
 export interface ParsedAttributes {
@@ -18,7 +19,6 @@ export interface ParsedAttributes {
 }
 
 const ALIGNMENTS: ReadonlySet<string> = new Set(['left', 'center', 'right']);
-const DIRECTIONS: ReadonlySet<string> = new Set(['down', 'right']);
 const KEYS: ReadonlySet<string> = new Set(['alt', 'caption', 'class', 'align', 'direction']);
 
 /** One `key="value"` pair, single or double quoted, with `\` escaping a quote or a backslash. */
@@ -74,16 +74,7 @@ export function parseAttributes(info: string): ParsedAttributes {
       attributes.align = value as Alignment;
       continue;
     }
-    if (key === 'direction') {
-      const direction = value.toLowerCase();
-      if (!DIRECTIONS.has(direction)) {
-        diagnostics.push(`Unknown direction ${JSON.stringify(value)}; laying out down.`);
-        continue;
-      }
-      attributes.direction = direction as Direction;
-      continue;
-    }
-    attributes[key as 'alt' | 'caption' | 'class'] = value;
+    attributes[key as 'alt' | 'caption' | 'class' | 'direction'] = value;
   }
   return { attributes, diagnostics };
 }

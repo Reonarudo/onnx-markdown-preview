@@ -3,109 +3,12 @@ svg.onnx {
   max-width: 100%;
   height: auto;
   /* A white card in every theme, like the sibling extensions; Netron's palette is designed
-     for a light canvas, and the padding and rounding make the card read as a figure. */
+     for a light canvas, and the padding and rounding make the card read as a figure.
+     The drawing paints itself (fills, strokes, fonts); only the card is presentation here. */
   background: #fff;
   border-radius: 6px;
   padding: 8px;
   box-sizing: border-box;
-  /* Every rule below is scoped to svg.onnx: these class names are generic, and the preview
-     is shared with the rest of the document. The widths were measured as Helvetica. */
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-svg.onnx text {
-  fill: #000;
-  stroke: none;
-  font-size: 11px;
-}
-
-svg.onnx .box {
-  fill: #fff;
-  stroke: #333;
-  stroke-width: 1;
-}
-
-svg.onnx .header {
-  fill: #333;
-}
-
-svg.onnx .type {
-  fill: #fff;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-svg.onnx .type .name {
-  font-weight: normal;
-  font-size: 11px;
-  opacity: .85;
-}
-
-svg.onnx .attribute,
-svg.onnx .weight {
-  fill: #000;
-}
-
-svg.onnx .key {
-  fill: #333;
-}
-
-svg.onnx .weight .key {
-  font-weight: 600;
-}
-
-/* Netron's categories and colours (grapher.css). */
-svg.onnx .category-layer { fill: rgb(51, 85, 136); }
-svg.onnx .category-activation { fill: rgb(112, 41, 33); }
-svg.onnx .category-pool { fill: rgb(51, 85, 51); }
-svg.onnx .category-normalization { fill: rgb(51, 85, 68); }
-svg.onnx .category-dropout { fill: rgb(69, 71, 112); }
-svg.onnx .category-shape { fill: rgb(108, 79, 71); }
-svg.onnx .category-tensor { fill: rgb(89, 66, 59); }
-svg.onnx .category-transform { fill: rgb(51, 85, 68); }
-svg.onnx .category-data { fill: rgb(85, 85, 85); }
-svg.onnx .category-quantization { fill: rgb(80, 40, 0); }
-svg.onnx .category-attention { fill: rgb(120, 60, 0); }
-svg.onnx .category-constant,
-svg.onnx .category-control { fill: #eee; }
-svg.onnx .category-constant + .type,
-svg.onnx .category-control + .type { fill: #000; }
-
-svg.onnx .pill {
-  fill: #eee;
-  stroke: #333;
-  stroke-width: 1;
-}
-
-svg.onnx .input .type,
-svg.onnx .output .type {
-  fill: #000;
-}
-
-svg.onnx .tensor {
-  fill: #555;
-  font-size: 11px;
-}
-
-svg.onnx .wire {
-  fill: none;
-  stroke: #000;
-  stroke-width: 1;
-}
-
-svg.onnx .arrow {
-  fill: #000;
-  stroke: none;
-}
-
-svg.onnx .label-box {
-  fill: #fff;
-  stroke: none;
-}
-
-svg.onnx .label {
-  fill: #555;
-  font-size: 10px;
 }
 
 .onnx-figure {

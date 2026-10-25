@@ -32,15 +32,16 @@ jobs:
         with:
           name: onnx-markdown-preview-${{ runner.os }}-vsix
           path: '*.vsix'
-  # Re-fetches the vendored Netron modules at the pinned commit and fails if a byte differs from
-  # what is committed, so the pin and the files cannot drift apart.
-  vendor:
+  minimum-vscode:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.0.0
         with:
           node-version-file: .nvmrc
-      - run: npm run vendor
-      - run: git diff --exit-code -- vendor/netron
+          cache: npm
+      - run: npm ci
+      - run: npm run package
+      - run: xvfb-run -a npm run test:package
+        env:
+          VSCODE_VERSION: 1.101.0

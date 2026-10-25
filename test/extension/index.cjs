@@ -29,9 +29,10 @@ exports.run = async () => {
     fence('graphviz', 'digraph { a -> b }'),
     fence('swift', 'let x = 42')
   ].join('\n'));
-  assert.equal((mixed.match(/<svg class="onnx"/g) ?? []).length, 2);
-  assert.match(mixed, /class="header category-layer"\/><text x="12" y="15" class="type">Conv<\/text>/);
-  assert.match(mixed, /<tspan class="key">W<\/tspan> ⟨8×3×3×3⟩/);
+  // The library's drawing paints itself and gets its natural width from the viewBox.
+  assert.equal((mixed.match(/<svg class="onnx" width="[\d.]+px" viewBox="/g) ?? []).length, 2);
+  assert.match(mixed, /class="header category-layer" fill="rgb\(51, 85, 136\)"\/><text x="12" y="15" class="type"[^>]*>Conv<\/text>/);
+  assert.match(mixed, /<tspan class="key"[^>]*>W<\/tspan> ⟨8×3×3×3⟩/);
   assert.match(mixed, />Sigmoid<\/text>/);
   assert.match(mixed, /class="[^"]*\blanguage-onnxtxt"/);
   assert.match(mixed, /class="[^"]*\blanguage-graphviz"/);
@@ -45,6 +46,13 @@ exports.run = async () => {
   assert.match(attributed, />&lt;b&gt;x&lt;\/b&gt;<\/text>/);
   assert.doesNotMatch(attributed, /<b>/);
 
+  // The author's class joins the library's, escaped.
+  assert.match(await render(fence('onnx {class="wide &quot;x"}', cnn)), /<svg class="onnx wide &amp;quot;x" width="/);
+
+  // `direction` is passed as written: anything but exact `down` or `right` is a failure (ADR 0008).
+  assert.match(await render(fence('onnx {direction="Right"}', cnn)),
+    /<div class="onnx-error" role="alert"><pre>Unknown direction &quot;Right&quot;: use down or right\.<\/pre><\/div>/);
+
   // A model error quotes the line with a caret; the rest of the document survives.
   const broken = await render('Before\n\n' + fence('onnx', 'g (float[1] x) => (float[1] y) {\n  y = Relu (x\n}') + '\nAfter');
   assert.match(broken, /<div class="onnx-error" role="alert"><pre>Unexpected token '}'\.\n\n3 │ }\n    \^<\/pre><\/div>/);
@@ -56,12 +64,26 @@ exports.run = async () => {
   assert.ok(Date.now() - started < 6000, 'timeout returns promptly');
   assert.match(await render(fence('onnx', 'g (float[1] x) => (float[1] y) { y = Relu (x) }')), /<svg class="onnx"/);
 
-  // The budget follows the setting live, and changing it retries a cached timeout.
+  // The budget follows the setting: a change restarts the renderer with the new budget and, once
+  // it has taken over, forgets cached outcomes, so a cached timeout is retried.
   const configuration = vscode.workspace.getConfiguration('onnx');
   assert.equal(configuration.get('layoutTimeout'), 3);
+  const slow = fence('onnx', dense);
+  const eventually = async (pattern, what) => {
+    const deadline = Date.now() + 60_000;
+    let html;
+    while (Date.now() < deadline) {
+      html = await render(slow);
+      if (pattern.test(html)) return;
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+    assert.fail(`${what}; last render: ${html.slice(0, 300)}`);
+  };
   await configuration.update('layoutTimeout', 60, vscode.ConfigurationTarget.Global);
   try {
-    assert.match(await render(fence('onnx', dense)), /<svg class="onnx"/);
+    await eventually(/<svg class="onnx" width="[\d.]+px"/, 'renders once the 60 s budget takes over');
+    await configuration.update('layoutTimeout', 0.5, vscode.ConfigurationTarget.Global);
+    await eventually(/Layout took longer than 0\.5 s \(onnx\.layoutTimeout\)/, 'times out under the 0.5 s budget');
   } finally {
     await configuration.update('layoutTimeout', undefined, vscode.ConfigurationTarget.Global);
   }

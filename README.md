@@ -86,10 +86,12 @@ stem (float[N, 3, 224, 224] x) => (float[N, 64, 56, 56] y) {
 | `caption` | Text shown beneath the graph |
 | `align` | `left`, `center` or `right` |
 | `class` | Extra CSS class on the graph's `<svg>` |
-| `direction` | `down` (the default) or `right`: which way the graph flows |
+| `direction` | `down` (the default) or `right`, exactly: which way the graph flows |
 
 Values are quoted. A mistyped or malformed attribute never costs you the
-graph: it is ignored, and a note is written to the output channel.
+graph: it is ignored, and a note is written to the output channel. The one
+exception is `direction`: any value but `down` or `right` is reported in place
+of the graph.
 
 ## Errors and limits
 
@@ -100,25 +102,29 @@ says so in one sentence.
 
 Layout runs in a worker thread with a time budget, `onnx.layoutTimeout`
 (3 seconds by default, 0.5 to 60). A graph that takes longer is reported as a
-timeout and not retried until the fence changes or the setting does. A fence
+timeout and not retried until the fence changes or the setting does; a change
+to the setting restarts the worker with the new limit. A fence
 may hold 1 MB of text and 1000 nodes; past that, a static drawing stops being
 readable, and the fence is refused with a message saying so. Drawings are
 cached, so editing elsewhere in the document costs nothing.
 
 ## Development
 
+Requires Node 22 or newer (see `.nvmrc`).
+
 ```sh
 npm ci
-npm run lint       # type-check
-npm run build      # bundle dist/extension.js and dist/worker.js
-npm test           # unit tests against the bundle
-npm run package    # build the VSIX
-npm run test:extension   # the test suite inside a real VS Code (downloads one)
+npm run lint            # tsc --noEmit
+npm test                # node --test, after building
+npm run package         # vsce package
+npm run test:package    # the VSIX inside a real VS Code
 ```
 
-The ONNX reader is Netron's own, vendored under `vendor/netron/` at a pinned
-commit; `npm run vendor` re-fetches it, and `THIRD_PARTY_NOTICES.md` says what
-is bundled and under which terms.
+The extension is the preview glue: fence attributes, figure wrapping, the
+cache and the setting. Reading, laying out and drawing models — Netron's
+reader, ELK and the drawing — live in onnx-renderer, pinned in `package.json`
+to a release tarball and shipped in the VSIX's `node_modules`.
+`THIRD_PARTY_NOTICES.md` says what ships and under which terms.
 
 To regenerate the Marketplace PNG from its SVG source, use librsvg:
 

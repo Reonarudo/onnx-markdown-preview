@@ -7,11 +7,3 @@ export const DENSE = (() => {
   const nodes = Array.from({ length: 16 }, (_, i) => `  o${i} = Sum (${Array.from({ length: 16 }, (_, j) => `i${j}`).join(', ')})`);
   return `dense (${inputs}) => (${outputs}) {\n${nodes.join('\n')}\n}`;
 })();
-
-export const CONV = `<ir_version: 8, opset_import: ["" : 17]>
-cnn (float[N, 3, 32, 32] x, float[8, 3, 3, 3] w = {}) => (float[N, 10] y) {
-  c = Conv <kernel_shape = [3, 3], pads = [1, 1, 1, 1], group = 1> (x, w)
-  r = Relu (c)
-  p = GlobalAveragePool (r)
-  y = Gemm <alpha = 1.0, transB = 1> (p, fc_w, fc_b)
-}`;
