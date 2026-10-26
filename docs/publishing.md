@@ -22,3 +22,5 @@ References: [Microsoft publishing guide](https://code.visualstudio.com/api/worki
 Microsoft also supports uploading the exact tested VSIX at the Marketplace publisher management page: select **ReoX86**, choose the existing extension’s **More Actions → Update**, select the release asset, and upload it. For a first release only, use **New extension → Visual Studio Code**. Sign-in can redirect through Microsoft's `app.vssps.visualstudio.com` identity service. This method does not require provisioning an Azure DevOps organization or changing an existing Azure directory. Use the Microsoft account authorized for this publisher.
 
 This project uses the personal Microsoft account publishing path, as the sibling previews do. Do not use the university directory, its credentials, resources, or service connections for this project.
+
+Version 0.2.0 was verified on the Marketplace; see [release-verification-0.2.0.md](release-verification-0.2.0.md).
