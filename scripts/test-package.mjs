@@ -16,7 +16,7 @@ try {
   const root = join(unpacked, 'extension');
   const library = 'node_modules/@reonarudo/onnx-renderer';
   for (const path of [
-    'dist/extension.js', 'media/preview.css', 'media/icon.png', 'readme.md', 'LICENSE.txt', 'THIRD_PARTY_NOTICES.md',
+    'dist/extension.js', 'media/preview.css', 'media/preview.js', 'media/icon.png', 'readme.md', 'LICENSE.txt', 'THIRD_PARTY_NOTICES.md',
     `${library}/package.json`, `${library}/dist/index.js`, `${library}/dist/worker.js`,
     ...['json.js', 'onnx.js', 'onnx-proto.js', 'onnx-metadata.json', 'protobuf.js', 'text.js', 'LICENSE'].map((name) => `${library}/vendor/netron/${name}`),
     `${library}/licenses/ELKJS-EPL-2.0.md`, `${library}/licenses/NETRON-LICENSE`, `${library}/THIRD_PARTY_NOTICES.md`,

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import MarkdownIt from 'markdown-it';
 import { createRuntime, type RenderInput, type RenderResult } from '@reonarudo/onnx-renderer';
 import { createPreview, createRenderer } from '../src/preview';
-import { DENSE } from './helpers';
+import { DENSE, rendering } from './helpers';
 
 const document = [
   '# Models',
@@ -62,7 +62,7 @@ test('the natural width is the drawing 0.1.2 drew: the viewBox width', async () 
   try {
     const html = createPreview(runtime, () => {}).extendMarkdownIt(new MarkdownIt())
       .render('```onnx\ng (float[1] x) => (float[1] y) { y = Relu (x) }\n```');
-    const [, width, viewBoxWidth] = /^<svg class="onnx" width="([\d.]+)px" viewBox="\S+ \S+ ([\d.]+) /.exec(html) ?? [];
+    const [, width, viewBoxWidth] = /^<svg class="onnx" width="([\d.]+)px" viewBox="\S+ \S+ ([\d.]+) /.exec(rendering(html)) ?? [];
     assert.ok(width);
     assert.equal(width, viewBoxWidth);
   } finally {

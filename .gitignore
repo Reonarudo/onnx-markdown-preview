@@ -118,3 +118,6 @@ dist/
 
 # Intermediate C and objects written by scripts/grammars.sh; only vendor/parsers/ is committed
 /build/
+
+# Written by scripts/test-preview.mjs when a live check fails
+test-preview-failure.png

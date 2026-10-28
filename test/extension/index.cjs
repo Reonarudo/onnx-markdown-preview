@@ -17,6 +17,7 @@ exports.run = async () => {
   const extension = vscode.extensions.getExtension('ReoX86.onnx-graph-preview');
   assert(extension, 'extension ReoX86.onnx-graph-preview is installed');
   assert.deepEqual(extension.packageJSON.contributes['markdown.previewStyles'], ['media/preview.css']);
+  assert.deepEqual(extension.packageJSON.contributes['markdown.previewScripts'], ['media/preview.js']);
   await extension.activate();
   await vscode.extensions.getExtension('vscode.markdown-language-features').activate();
   const render = (markdown) => vscode.commands.executeCommand('markdown.api.render', markdown);
@@ -37,6 +38,16 @@ exports.run = async () => {
   assert.match(mixed, /class="[^"]*\blanguage-onnxtxt"/);
   assert.match(mixed, /class="[^"]*\blanguage-graphviz"/);
   assert.match(mixed, /class="[^"]*\blanguage-swift"/);
+
+  // The view toggle's wrapper, and its source view delegated to VS Code's own fence rule: the
+  // `<pre>` carries VS Code's shell (`dir="auto"`, not the plugin's hand-built fallback) minus
+  // the scroll-sync class and line, which only the wrapper carries.
+  assert.match(mixed, /<div class="onnx-fence code-line" data-line="0" data-fence-key="[0-9a-f]{8}"><button type="button" class="onnx-toggle" aria-pressed="false" aria-label="Source view" title="Source view"><svg class="onnx-icon-code"/);
+  assert.match(mixed, /<\/button><div class="onnx-rendering"><svg class="onnx" width="[\d.]+px"/);
+  assert.match(mixed, /<\/div><pre><code class="language-onnx" dir="auto">cnn \(float\[N, 3, 32, 32\] x,/);
+  assert.equal((mixed.match(/<div class="onnx-fence /g) ?? []).length, 2, 'one wrapper per claimed fence, none for delegated ones');
+  assert.equal((mixed.match(/<pre><code class="language-onnx" dir="auto">/g) ?? []).length, 2, 'no sync attributes on the source <code>');
+  for (const line of ['0', '8']) assert.equal((mixed.match(new RegExp(`data-line="${line}"`, 'g')) ?? []).length, 1, `one scroll-sync element for the fence at line ${line}`);
 
   // Attributes, escaping and a tolerated typo; model text is escaped too.
   const attributed = await render(fence('onnx {alt="A net" caption="Figure 1: <net>" align="center" direction="right" algin="x"}',

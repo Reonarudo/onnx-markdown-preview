@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 — 2026-10-28
+
+- Every graph carries a view toggle in its top corner that flips the fence
+  between the graph and its source text, highlighted as the preview highlights
+  any code block. A flipped fence stays flipped while the document is edited,
+  after *Markdown: Refresh Preview* and when the preview is reopened. The
+  toggle is also present on error cards. It is a reader's control; no fence
+  attribute presets it.
+- A preview script (`media/preview.js`) is contributed for the first time;
+  `npm run test:preview` exercises it in a live preview through Playwright.
+
 ## 0.2.0 — 2026-10-25
 
 - Graphs are drawn by [onnx-renderer](https://github.com/Reonarudo/onnx-renderer)

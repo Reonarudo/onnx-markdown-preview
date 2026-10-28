@@ -93,6 +93,15 @@ graph: it is ignored, and a note is written to the output channel. The one
 exception is `direction`: any value but `down` or `right` is reported in place
 of the graph.
 
+## Viewing the source
+
+Every graph carries a small button in its top corner that flips the fence
+between the graph and the fence's text, highlighted the way the preview shows
+any other code block. A flipped fence stays flipped while you edit the
+document, after *Markdown: Refresh Preview*, and when the preview is reopened;
+flip it back to see the graph again. The button is a reader's control: a fence
+cannot be written to open in source view.
+
 ## Errors and limits
 
 A model that does not parse is reported in place of the graph, quoting the
@@ -118,6 +127,7 @@ npm run lint            # tsc --noEmit
 npm test                # node --test, after building
 npm run package         # vsce package
 npm run test:package    # the VSIX inside a real VS Code
+npm run test:preview    # the view toggle in a live preview, through Playwright
 ```
 
 The extension is the preview glue: fence attributes, figure wrapping, the
