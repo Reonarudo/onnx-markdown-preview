@@ -29,8 +29,11 @@ const HEIGHT = 768;
 
 // The Electron binary is `Code` from VS Code 1.10x on and `Electron` in older builds.
 const electron = process.env.VSCODE_EXECUTABLE ?? await (async () => {
-  const builds = (await readdir('.vscode-test').catch(() => [])).filter((name) => name.startsWith('vscode-'));
-  for (const build of builds.reverse()) {
+  // Newest build first, by version number: a 1.95.0 left by an older run sorts after 1.143.1 by name.
+  const version = (name) => name.replace(/^.*-(\d+\.\d+\.\d+)$/, '$1').split('.').map(Number);
+  const builds = (await readdir('.vscode-test').catch(() => [])).filter((name) => name.startsWith('vscode-'))
+    .sort((a, b) => version(b).map((n, i) => n - version(a)[i]).find((d) => d !== 0) ?? 0);
+  for (const build of builds) {
     const bin = join('.vscode-test', build, 'Visual Studio Code.app/Contents/MacOS');
     const name = (await readdir(bin).catch(() => [])).find((file) => file === 'Code' || file === 'Electron');
     if (name) return join(bin, name);
@@ -50,6 +53,7 @@ await mkdir(workspace);
 await cp(FIXTURE.file, document);
 await writeFile(join(userData, 'User', 'settings.json'), JSON.stringify({
   'workbench.startupEditor': 'none',
+  'workbench.secondarySideBar.defaultVisibility': 'hidden',
   'workbench.colorTheme': 'Default Dark Modern',
   'workbench.tips.enabled': false,
   'breadcrumbs.enabled': false,
@@ -123,7 +127,13 @@ try {
   const editElsewhere = async () => {
     const sentinel = `Edited ${++sentinels}.`;
     await focusEditor();
-    await page.keyboard.press('Meta+End');
+    // Go to Line clamps to the last line; Meta+End proved unreliable right after a preview click.
+    await page.keyboard.press('Control+G');
+    await page.waitForSelector('.quick-input-widget');
+    await page.keyboard.type('999999');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(300);
+    await page.keyboard.press('End');
     await page.keyboard.press('Enter');
     await page.keyboard.press('Enter');
     await page.keyboard.type(sentinel);
