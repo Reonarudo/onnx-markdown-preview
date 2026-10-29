@@ -424,7 +424,7 @@ A roll-out session follows this in order. Copy from the pilot's merged code, not
    ```
 
    Extension ids: `ReoX86.onnx-graph-preview`, `ReoX86.gnuplot-markdown-preview`, `ReoX86.graphviz-diagram-preview`, `ReoX86.pikchr-diagram-preview`, `ReoX86.smiles-structure-preview`, `ReoX86.spice-schematic-preview`. The sample should cover: plain fence, captioned centred, right-aligned with `alt`, a failing fence, long lines and a tall body, two identical bodies, an ordinary `json` fence beside it, a fence inside an RTL container, and the extension's quirks below. Check in light, dark and high contrast.
-10. **CHANGELOG and release.** Add the entry to `CHANGELOG.md` under a new version, and to `docs/release-notes.md` where the repo keeps one. Publish and verify following the repo's existing `docs/publishing.md` and `release-verification-<version>.md` pattern; the verification note records a green `test:preview` run (section 9.7).
+10. **CHANGELOG and release.** Add the entry to `CHANGELOG.md` under a new version, and to `docs/release-notes.md` where the repo keeps one. Publish and verify following the shared `PUBLISHING.md` beside the sibling repositories and the repo's `docs/release-verification-<version>.md` pattern; the verification note records a green `test:preview` run (section 9.7).
 
 ### Per-extension quirks
 
